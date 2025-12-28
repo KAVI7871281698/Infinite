@@ -1,6 +1,4 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
 
 <link rel="stylesheet" href="{% static 'category.css' %}" />
 
@@ -13,13 +11,12 @@
 <div class="page-header">
   <h1>🎬 Product Categories</h1>
   <p>
-    Explore our curated collections of cinema-inspired fashion.
-    From everyday essentials to exclusive collectibles.
+    Explore our curated collections of cinema-inspired fashion. From everyday
+    essentials to exclusive collectibles.
   </p>
 </div>
 
 <div class="category-wrapper">
-
   <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar">
     <h3>Filter Products</h3>
@@ -28,7 +25,6 @@
 
     <h4>Categories</h4>
     <ul>
-
       <!-- ALL -->
       <li class="{% if not selected_category %}active{% endif %}">
         <a href="{% url 'categories' %}">
@@ -38,7 +34,9 @@
       </li>
 
       <!-- CINEPHILE TEES -->
-      <li class="{% if selected_category == 'Cinephile Tees' %}active{% endif %}">
+      <li
+        class="{% if selected_category == 'Cinephile Tees' %}active{% endif %}"
+      >
         <a href="{% url 'categories' %}?category=Cinephile Tees">
           Cinephile Tees
           <span>{{ category_counts.cinephile_tees|default:0 }}</span>
@@ -60,25 +58,33 @@
           <span>{{ category_counts.accessories|default:0 }}</span>
         </a>
       </li>
-
     </ul>
   </aside>
 
   <!-- ================= PRODUCTS ================= -->
   <main class="product-section">
-
     <div class="prod-toolbar">
-      <input type="text" placeholder="Search products…" />
+      <form method="get">
+        {% if selected_category %}
+        <input type="hidden" name="category" value="{{ selected_category }}" />
+        {% endif %}
+
+        <input
+          type="text"
+          name="q"
+          placeholder="Search products…"
+          value="{{ search_query }}"
+        />
+      </form>
     </div>
 
     <div class="product-grid">
       {% for i in view_product %}
       <div class="product-card">
-
         <div class="badge">{{ i.product_Categorie }}</div>
 
         {% if i.product_img %}
-        <img src="{{ i.product_img.url }}" alt="{{ i.product_name }}">
+        <img src="{{ i.product_img.url }}" alt="{{ i.product_name }}" />
         {% endif %}
 
         <h4>{{ i.product_name }}</h4>
@@ -91,13 +97,11 @@
           </a>
           <a href="#" class="details-btn">View Details</a>
         </div>
-
       </div>
       {% empty %}
       <p>No products found in this category.</p>
       {% endfor %}
     </div>
-
   </main>
 </div>
 

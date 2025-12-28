@@ -4,7 +4,7 @@ from django.contrib import messages
 import razorpay
 from django.conf import settings
 from django.http import HttpResponse
-from django.db.models import Count
+from django.db.models import Count,Q
 from django.utils import timezone
 from decimal import Decimal
 from django.db.models import Sum
@@ -42,37 +42,90 @@ def contact(request):
     return render(request, 'contact.html')
 
 def signature_collect(request):
-    signature_products = product.objects.filter(
+    query = request.GET.get('q')
+
+    products = product.objects.filter(
         product_Categorie__iexact='signature_collection'
     )
 
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'signature_collection.html', {
-        'products': signature_products
+        'products': products
     })
 
+
 def special_services(request):
+    query = request.GET.get('q')
+
     products = product.objects.filter(product_Categorie__iexact='Special Services')
+
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'special_services.html', {'products': products})
 
 
+
 def permium_wear(request):
+    query = request.GET.get('q')
+
     products = product.objects.filter(product_Categorie__iexact='Premium Wear')
+
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'permium_wear.html', {'products': products})
 
-
 def limited_edition_collection(request):
+    query = request.GET.get('q')
+
     products = product.objects.filter(product_Categorie__iexact='Limited Edition')
+
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'limited_edition_collection.html', {'products': products})
 
-
 def accessories(request):
+    query = request.GET.get('q')
+
     products = product.objects.filter(product_Categorie__iexact='Accessories')
+
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'accessories.html', {'products': products})
 
-
 def cinephile_tees(request):
+    query = request.GET.get('q')
+
     products = product.objects.filter(product_Categorie__iexact='Cinephile Tees')
+
+    if query:
+        products = products.filter(
+            Q(product_name__icontains=query) |
+            Q(product_des__icontains=query)
+        )
+
     return render(request, 'cinephile_tees.html', {'products': products})
+
 
 def fqa(request):
     return render(request, 'FQA.html')
@@ -162,10 +215,18 @@ def logout(request):
 
 def categories(request):
     selected_category = request.GET.get('category')
+    search_query = request.GET.get('q')  
 
-    view_product = product.objects.filter(
-        product_Categorie=selected_category
-    ) if selected_category else product.objects.all()
+    view_product = product.objects.all()
+    
+    if selected_category:
+        view_product = view_product.filter(product_Categorie=selected_category)
+
+    if search_query:
+        view_product = view_product.filter(
+            Q(product_name__icontains=search_query) |
+            Q(product_des__icontains=search_query)
+        )
 
     raw_counts = product.objects.values('product_Categorie').annotate(count=Count('id'))
 
@@ -177,6 +238,7 @@ def categories(request):
     return render(request, 'categories.html', {
         'view_product': view_product,
         'selected_category': selected_category,
+        'search_query': search_query,
         'category_counts': category_counts,
         'total_count': product.objects.count()
     })
